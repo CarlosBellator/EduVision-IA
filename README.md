@@ -24,14 +24,13 @@ O **EduVision IA** tem como objetivo tornar gráficos acessíveis para pessoas c
 
 ```
 application/
-├── main.py                 # Arquivo principal
-├── graficosobj.py         # Geração de objetos 3D
+├── main.py                # Arquivo principal
+├── graph_crator.py        # Geração de objetos 3D
 ├── requirements.txt       # Dependências
-├── grafico_tatil_base.stl # Modelo 3D de exemplo
-├── model1/
-│   └── best.pt           # Modelo YOLOv8 treinado
-├── results/              # Gráficos extraídos
-└── image/                # Imagens de exemplo
+├── MLs/
+│   └── ML1.pt             # Modelo1 YOLOv8 treinado
+├── results/               # Gráficos extraídos
+└── image/                 # Imagens de exemplo
 ```
 
 ## 🚀 Instalação
