@@ -178,4 +178,11 @@ pyrightconfig.json
 .env.production
 .env.staging
 
+
+
+#Project specific files
+./results
+./results/*
+./grafico_tatil.stl
+
 # End of https://www.toptal.com/developers/gitignore/api/python

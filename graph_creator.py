@@ -348,7 +348,7 @@ def graficoobj(valores_grafico):
                 print("Correção de 'watertight' bem-sucedida.")
             else:
                 print("Não foi possível tornar o modelo 'watertight' automaticamente. Verifique o STL.")
-        nome_arquivo_saida = 'grafico_tatil_base.stl'
+        nome_arquivo_saida = 'grafico_tatil.stl'
         modelo_final_combinado.export(nome_arquivo_saida)
         print(f"Arquivo STL '{nome_arquivo_saida}' gerado com sucesso!")
     else:

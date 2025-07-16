@@ -4,7 +4,7 @@ from ultralytics import YOLO
 import os
 import sys
 import webbrowser
-import graficosobj
+import graph_creator
 
 from PIL import Image
 import google.generativeai as genai
@@ -33,6 +33,10 @@ model = genai.GenerativeModel(MODEL_ID)
 
 
 output_folder = './results/'
+# Verifica se a pasta de saída existe, caso contrário, cria
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+
 def clear():
     if os.name == 'nt':  # 'nt' é para Windows
         os.system('cls')
@@ -55,7 +59,7 @@ def import_img():
 
 def cut_image(image_path):
     print('Buscando gráficos na imagem')
-    model = YOLO("./model1/best.pt")
+    model = YOLO("./MLs/ML1.pt")
     image = cv2.imread(image_path)
     results = model(image_path)
     result = results[0]
@@ -186,7 +190,7 @@ def main():
     valores_analise_grafico = analise_grafico(grafico_path)
     print(valores_analise_grafico)
     valores_grafico = recortarVariaveis(valores_analise_grafico)
-    grafico = graficosobj.graficoobj(valores_grafico)
+    grafico = graph_creator.graficoobj(valores_grafico)
     print("gerado")
     print(grafico)
 
