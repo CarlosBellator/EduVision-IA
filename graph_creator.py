@@ -1,10 +1,11 @@
-import numpy as np
+import numpy as np # Computação numérica e arrays
 from shapely.geometry import LineString, Point, Polygon
-import trimesh
-import trimesh.transformations as tf
+import trimesh # Manipulação de objetos 3D 
+import trimesh.transformations as tf # Manipulação de objetos 3D
 
+graph_output_folder = './Gráficos-3D'
 
-def graficoobj(valores_grafico):
+def graficoobj(valores_grafico,graph_name):
     # ------------------------
     # CONFIGURAÇÕES GLOBAIS E DO GRÁFICO
     # ------------------------
@@ -348,10 +349,10 @@ def graficoobj(valores_grafico):
                 print("Correção de 'watertight' bem-sucedida.")
             else:
                 print("Não foi possível tornar o modelo 'watertight' automaticamente. Verifique o STL.")
-        nome_arquivo_saida = 'grafico_tatil.stl'
+        nome_arquivo_saida = f'{graph_output_folder}/{graph_name}_tatil.stl'
         modelo_final_combinado.export(nome_arquivo_saida)
         print(f"Arquivo STL '{nome_arquivo_saida}' gerado com sucesso!")
+        return modelo_final_combinado  # Retorna o objeto 3D completo
     else:
         print("Nenhuma malha foi gerada para o modelo final. Verifique as configurações e dados.")
-
-    return modelo_final_combinado.export
+        return None  # Retorna None se falhou

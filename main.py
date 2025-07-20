@@ -1,18 +1,14 @@
 print('Iniciando...')
-import cv2
-from ultralytics import YOLO
-import os
-import sys
-import webbrowser
-import graph_creator
-
-from PIL import Image
-import google.generativeai as genai
-import os
+import cv2 # Processamento e manipulação de imagens 
+from ultralytics import YOLO # Análisa objetos na imagem com Machine Learnin
+import os # Operações com o sistema operacional
+from PIL import Image # Prepara imagens para o Gemini
+import google.generativeai as genai # Uso temporáio do gemini para detecção dos valores dos gráficos
+import graph_creator # Importa .py de criação de graficos 3D
 
 # Tentar carregar variáveis de ambiente do arquivo .env
 try:
-    from dotenv import load_dotenv
+    from dotenv import load_dotenv # Responsável por ler chave da API do google se estiver em arquivo .env 
     load_dotenv()
 except ImportError:
     pass  # python-dotenv não está instalado, usar apenas variáveis de ambiente do sistema
@@ -30,40 +26,70 @@ genai.configure(api_key=api_key)
 MODEL_ID = "gemini-2.0-flash"
 model = genai.GenerativeModel(MODEL_ID)
 
-
-
+# Configura pasta de saída de resultados dos gráficos encontrados naa imagem
 output_folder = './results/'
 # Verifica se a pasta de saída existe, caso contrário, cria
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
 def clear():
+    # Essa função é responsável por fazer a limpiza do terminal com base no sistema eperacional
     if os.name == 'nt':  # 'nt' é para Windows
         os.system('cls')
     else:  # 'posix' é para sistemas Unix/Linux (incluindo macOS)
         os.system('clear')
 
 def start():
+    # Essa função é responsável por mostrar o Título da aplicação
     clear()
-    print(""" Bem vindo à
+    print("""\n Bem vindo à
                  𝔼𝕕𝕦𝕍𝕚𝕤𝕚𝕠𝕟   𝕀𝔸 \n""")
 
+def menu():
+    # Essa função é responsável de mostrar a tela principal com seus elementos de título e menu
+    clear()
+    start()
+    print('''Escolha uma opção:
+             1. Análisar uma imagem
+             2. Listar gráficos
+             3. Criar modelo de um Gráfico da lista
+             4. Imprimir gráfico
+             5. Encerrar o programa
+''')
+    return 
+
 def import_img():
+    '''
+    Essa função é responsável por verificar e importar a imagem para análise.
+    Inputs: Caminho da imagem.
+    Output: - Imagem
+            - Nome_do_arquivo.
+    '''
+    
     image_path = input('Diga o caminho da imagem: ')
     if (os.path.exists(image_path)):
-        return image_path
+        image = cv2.imread(image_path)
+        nome_arquivo = os.path.basename(image_path)  # Extrai apenas o nome do arquivo
+        nome_arquivo = os.path.splitext(nome_arquivo)[0]  # Retmove a extenção do arquivo ".png"
+        return image, nome_arquivo
     else:
         start()
         print('Caminho não existe! \n')
-        import_img()
+        return import_img()
 
-def cut_image(image_path):
-    print('Buscando gráficos na imagem')
+def cut_image(image, nome_arquivo):
+    '''
+    Essa função é responsável por buscar os elementos(Enuniados e Gráficos) na imagem e fazer o recorte dos gráficos.
+    Inputs: - Imagem
+            - Nome da imagem.
+    Output: Salva os recortes dos gráficos.
+    '''
+    print('Buscando gráficos na imagem... \n')
     model = YOLO("./MLs/ML1.pt")
-    image = cv2.imread(image_path)
-    results = model(image_path)
-    result = results[0]
-    graph_counter = 0
+    results = model(image) # Faz a analise com a ML e armazena os resultados em results
+    result = results[0] # Define como result, os retornos com a tag 0, ou seja a tag de gráfico, enquanto a tag 1 são os enunciados
+    graph_counter = 0 
+    # Faz o recorte dos gráficos
     for i, box in enumerate(result.boxes):
         x1, y1, x2, y2 = map(int, box.xyxy[0])
         cls_id = int(box.cls[0])
@@ -73,45 +99,89 @@ def cut_image(image_path):
             # Recorte do objeto
             cropped = image[y1:y2, x1:x2]
             # Criar nome de arquivo de saída
-            output_path = os.path.join(output_folder, f"Grafico_{graph_counter+1}.jpg")
+            output_path = os.path.join(output_folder, f"{nome_arquivo}-Grafico_{graph_counter+1}.jpg")
             # Salvar recorte
             cv2.imwrite(output_path, cropped)
             graph_counter += 1
-    clear()
-    return graph_counter
+    print(f"* {graph_counter} gráficos foram encontrados e salvos em {output_folder}")
+    input('Pressione entar para continuar...')
+    return main()
 
-def save(graph_images):
-    print(f"Foram salvos {graph_images} gráficos")
-    
-def listar_graficos():
-    listar_graficos = input('Deseja listar os gráficos? (y ou n): ')
-    clear()
-    print('Gráficos: \n')
-    if listar_graficos == 'y':
-        graficos = os.listdir(output_folder)
-        graficos.sort()
-        count = 0
-        for i in graficos:
-            count = count+1
-            print(f'{count}. {i}')
-        return count
-
-
-def selecionar_grafico(quantidade):
-    grafico = int(input('Digite o gráfico para abrir: '))
-    if grafico >0 and grafico <= quantidade:
-        clear()
-        print(f'Gráfico {grafico} selecionado')
+def deletar_grafico():
+    start()
+    listar_graficos()
+    excluir = input('Deseja excluir algum gráfico? (s/n):').lower()
+    if  excluir == 's' or excluir == 'sim':
+        grafico_path, _ = selecionar_grafico()
+        if graph_path != None:
+            os.remove(grafico_path)
+            print('Gráfico removido com sucesso.')
+        return deletar_grafico()
+    elif excluir == 'n' or excluir =='não':
+        main()
     else:
-        print('Gráfico não encontrado, tente novamente')
-        grafico = selecionar_grafico(quantidade)
+        input('Opção inválida, pressione enter para tente novamente')
+        return deletar_grafico()
+    
+        
+def listar_graficos():
+    '''
+    Essa função é responsável por mostrar a lista de imagens de gráficos e deletar se necessário.
+    Inputs: - 'deseja apagar algum gráfico?'
+            - gráfico para ser deletado.
+    Output: - Deleta o gráfico solicitado
+    '''
+
+    print('Gráficos:\n')
+    graficos = os.listdir(output_folder)
+    graficos.sort()
+    count = 0
+    for i in graficos:
+        count = count+1
+        print(f'{count}. {i}')
+    if not count:
+        print(f'*{'Nenhum gráfico na lista :c'.center(30)}*\n')
+        input('Pressione enter para voltar para o menu principal...')
+        main()
+    print()
+def selecionar_grafico():
+    '''
+    Essa função é responsável por fazer a seleção do gráfico, pode ser usado em qualquer circunstancia.
+    Input: - gráfico que para selecionar
+    Output: - Retorna o caminho da imagem selecionada.
+    '''
+    #Conta a quantidade de imagens de gráficos na pasta de saida
+    graficos = os.listdir(output_folder)
+    graficos.sort()
+    quantidade = 0
+    for i in graficos:
+        quantidade = quantidade+1
+    try:    
+        grafico = int(input('Digite o número do gráfico para selecionar: '))
+        if grafico >0 and grafico <= quantidade:
+            clear()
+            print(f'Gráfico {grafico} selecionado')
+        else:
+            input('Gráfico não encontrado, pressione enter para tentar novamente')
+            return None, None
+    except:
+        input('Digite o número do gráfico desejado, pressione enter para tentar novamente')
+        return None, None
         
     graficos = os.listdir(output_folder)
     graficos.sort()
     grafico_path = os.path.join(output_folder, graficos[grafico-1])
-    return grafico_path
+    # Extrai o nome do arquivo
+    nome_arquivo = os.path.basename(grafico_path)  # Extrai apenas o nome do arquivo
+    nome_arquivo = os.path.splitext(nome_arquivo)[0]  # Retmove a extenção do arquivo ".png"
+    return grafico_path, nome_arquivo
 
 def analise_grafico(grafico_path):
+    '''
+    Essa função é responsável por fazer a análise do gráfico com o gemini(temporáriamente)
+    Input: - Caminho do gráfico para análise
+    Output: - Retornar os dados do gráfico enviado
+    '''
     img = Image.open(grafico_path)
 
     prompt = """Analise o gráfico e me retorne apenas suas medidas conforme o modelo:
@@ -126,24 +196,19 @@ def analise_grafico(grafico_path):
     
 def recortarVariaveis(data_string):
     """
-    Extrai um bloco de código Python de uma string e executa-o
-    para retornar as variáveis definidas dentro do bloco.
-
-    Args:
-        data_string (str): A string contendo o bloco de código a ser extraído.
-
-    Returns:
-        dict: Um dicionário contendo as variáveis extraídas do bloco de código.
-              Retorna um dicionário vazio se o bloco de código não for encontrado.
+    Essa função é responsável por recortar os valores do gráfico retornados pelo gemini
+    Inputs: - data_string (str): A string contendo o bloco de código a ser extraído.
+    Outputs: - dict: Um dicionário contendo as variáveis extraídas do bloco de código.
+             - Retorna um dicionário vazio se o bloco de código não for encontrado.
     """
     # --- Extração do Bloco de Código ---
 
     # Encontra a posição inicial do bloco de código.
-    # Adicionamos 3 para pular os caracteres "```" e começar no código real.
     start_index = data_string.find("```")
     if start_index == -1: # Verifica se o marcador inicial foi encontrado
         print("Erro: Marcador inicial de código '```' não encontrado na string.")
-        return {}
+        return
+    # Adicionamos 3 para pular os caracteres "```" e começar no código real.
     start_index += 3
 
     # Encontra a posição final do bloco de código.
@@ -151,11 +216,10 @@ def recortarVariaveis(data_string):
     end_index = data_string.rfind("```")
     if end_index == -1 or end_index <= start_index: # Verifica se o marcador final foi encontrado e é válido
         print("Erro: Marcador final de código '```' não encontrado ou inválido na string.")
-        return {}
+        return 
 
     # Extrai a substring que contém apenas o código Python.
-    # O método .strip() remove quaisquer espaços em branco extras ou quebras de linha
-    # no início e no final do bloco extraído.
+    # O método .strip() remove quaisquer espaços em branco extras ou quebras de linha no início e no final do bloco extraído.
     code_block = data_string[start_index:end_index].strip()
 
     # --- Execução do Código e Captura das Variáveis ---
@@ -177,23 +241,46 @@ def recortarVariaveis(data_string):
     # no bloco de código.
     return extracted_vars
 
-
-
+def criar_modelo3d():
+    start()
+    listar_graficos()
+    graph_path, graph_name = selecionar_grafico()
+    if graph_path != None:
+        graph_values = analise_grafico(graph_path)
+        graph_values_dict = recortarVariaveis(graph_values)
+        graph_creator.graficoobj(graph_values_dict,graph_name)
+        input('Pressione enter para voltar para o menu principal...')
+        main()
+    else:
+        criar_modelo3d()
 
 def main():
-    start()
-    question_img = import_img()
-    graph_images = cut_image(question_img)
-    save(graph_images)
-    quantidade = listar_graficos()
-    grafico_path = selecionar_grafico(quantidade)
-    valores_analise_grafico = analise_grafico(grafico_path)
-    print(valores_analise_grafico)
-    valores_grafico = recortarVariaveis(valores_analise_grafico)
-    grafico = graph_creator.graficoobj(valores_grafico)
-    print("gerado")
-    print(grafico)
-
+    opcao = menu() # Mostra o menu da aplicação
+    opcao = int(input('Digite o número da opção e pressione enter: '))
+    try:
+        match opcao:
+            case 1: # 1. Análisar uma imagem
+                start()
+                image, nome_arquivo = import_img()
+                cut_image(image, nome_arquivo)
+                
+            case 2: # 2. Listar gráficos
+                deletar_grafico()
+            case 3: # 3. Criar modelo de um Gráfico da lista
+                criar_modelo3d()
+            case 4: # 4. Imprimir gráfico
+                input('\nFunção em desenvolvimento...')
+                return main()
+            case 5: # 5. Encerrar o programa
+                clear()
+                print('Finalizando programa...')
+                exit
+            case _:
+                input('Opção invalida, digite uma opção válida! Pressione enter para tentar novamente...')
+                main()
+    except:
+        input('Opção invalida, digite um número! Pressione enter para tentar novamente...')
+        main()
 
 if __name__ == '__main__':
     main()

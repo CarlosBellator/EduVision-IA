@@ -3,6 +3,5 @@ ultralytics
 numpy
 shapely
 trimesh
-triangle
 google-generativeai
 python-dotenv

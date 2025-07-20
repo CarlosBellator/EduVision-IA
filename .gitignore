@@ -181,8 +181,10 @@ pyrightconfig.json
 
 
 #Project specific files
-./results
-./results/*
-./grafico_tatil.stl
+Gráficos-3D
+Gráficos-3D/*
+results
+results/*
+grafico_tatil.stl
 
 # End of https://www.toptal.com/developers/gitignore/api/python
