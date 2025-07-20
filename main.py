@@ -26,11 +26,16 @@ genai.configure(api_key=api_key)
 MODEL_ID = "gemini-2.0-flash"
 model = genai.GenerativeModel(MODEL_ID)
 
-# Configura pasta de saída de resultados dos gráficos encontrados naa imagem
+# Configura pasta de saída de resultados dos gráficos encontrados na imagem
 output_folder = './results/'
 # Verifica se a pasta de saída existe, caso contrário, cria
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
+ # Confiura a pasta de saída de resultados dos gráficos 3D
+graph3d_output_folder = './Gráficos-3D'
+# Verifica se a pasta de saída existe, caso contrário, cria
+if not os.path.exists(graph3d_output_folder):
+    os.makedirs(graph3d_output_folder)
 
 def clear():
     # Essa função é responsável por fazer a limpiza do terminal com base no sistema eperacional
@@ -248,7 +253,7 @@ def criar_modelo3d():
     if graph_path != None:
         graph_values = analise_grafico(graph_path)
         graph_values_dict = recortarVariaveis(graph_values)
-        graph_creator.graficoobj(graph_values_dict,graph_name)
+        graph_creator.graficoobj(graph_values_dict,graph_name,graph3d_output_folder)
         input('Pressione enter para voltar para o menu principal...')
         main()
     else:

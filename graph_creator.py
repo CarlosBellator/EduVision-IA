@@ -3,9 +3,10 @@ from shapely.geometry import LineString, Point, Polygon
 import trimesh # Manipulação de objetos 3D 
 import trimesh.transformations as tf # Manipulação de objetos 3D
 
-graph_output_folder = './Gráficos-3D'
 
-def graficoobj(valores_grafico,graph_name):
+
+
+def graficoobj(valores_grafico,graph_name,output_folder):
     # ------------------------
     # CONFIGURAÇÕES GLOBAIS E DO GRÁFICO
     # ------------------------
@@ -349,7 +350,7 @@ def graficoobj(valores_grafico,graph_name):
                 print("Correção de 'watertight' bem-sucedida.")
             else:
                 print("Não foi possível tornar o modelo 'watertight' automaticamente. Verifique o STL.")
-        nome_arquivo_saida = f'{graph_output_folder}/{graph_name}_tatil.stl'
+        nome_arquivo_saida = f'{output_folder}/{graph_name}_tatil.stl'
         modelo_final_combinado.export(nome_arquivo_saida)
         print(f"Arquivo STL '{nome_arquivo_saida}' gerado com sucesso!")
         return modelo_final_combinado  # Retorna o objeto 3D completo
