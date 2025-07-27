@@ -118,7 +118,7 @@ def deletar_grafico():
     excluir = input('Deseja excluir algum gráfico? (s/n):').lower()
     if  excluir == 's' or excluir == 'sim':
         grafico_path, _ = selecionar_grafico()
-        if graph_path != None:
+        if grafico_path != None:
             os.remove(grafico_path)
             print('Gráfico removido com sucesso.')
         return deletar_grafico()
@@ -145,7 +145,7 @@ def listar_graficos():
         count = count+1
         print(f'{count}. {i}')
     if not count:
-        print(f'*{'Nenhum gráfico na lista :c'.center(30)}*\n')
+        print(f"*{'Nenhum gráfico na lista :c'.center(30)}*\n")
         input('Pressione enter para voltar para o menu principal...')
         main()
     print()
