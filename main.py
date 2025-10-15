@@ -4,7 +4,7 @@ from ultralytics import YOLO # Análisa objetos na imagem com Machine Learnin
 import os # Operações com o sistema operacional
 from PIL import Image # Prepara imagens para o Gemini
 import google.generativeai as genai # Uso temporáio do gemini para detecção dos valores dos gráficos
-import graph_creator # Importa .py de criação de graficos 3D
+from home.EduVision_IA.graph_creator import graficoobj # Importa .py de criação de graficos 3D
 
 # Tentar carregar variáveis de ambiente do arquivo .env
 try:
